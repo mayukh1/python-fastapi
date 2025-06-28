@@ -6,14 +6,14 @@ FROM registry.access.redhat.com/rhel8/python-39
 WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt requirements.txt
+COPY requirement.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app code
-COPY . .
+COPY authentication authentication
 
 # Expose port
 EXPOSE 8000
 
 # Run the app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "authentication.main:app", "--host", "0.0.0.0", "--port", "8000"]
