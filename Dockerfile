@@ -1,7 +1,7 @@
 # Use official Python image
 #FROM registry.access.redhat.com/rhel8/python-39
 #FROM registry.access.redhat.com/ubi9/python-39:1-90
-FROM registry.redhat.io/rhel8/python-39
+FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
