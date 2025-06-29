@@ -9,7 +9,7 @@ WORKDIR /app
 # Install dependencies
 COPY requirement.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install python-multipart
 # Copy app code
 COPY authentication authentication
 
