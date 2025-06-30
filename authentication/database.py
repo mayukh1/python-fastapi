@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 # Build DB URL from environment variables
 POSTGRESQL_USER = os.getenv("POSTGRESQL_USER","postgres")
 POSTGRESQL_PASSWORD = os.getenv("POSTGRESQL_PASSWORD","root")
-POSTGRESQL_HOST = os.getenv("POSTGRESQL_HOST", "postgresql")
+POSTGRESQL_HOST = os.getenv("POSTGRESQL_HOST", "localhost")
 POSTGRESQL_PORT = os.getenv("POSTGRESQL_PORT", "5432")
 POSTGRESQL_DATABASE = os.getenv("POSTGRESQL_DATABASE","test_db")
 
