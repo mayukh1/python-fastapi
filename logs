@@ -1,0 +1,174 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  creationTimestamp: '2025-07-17T12:14:09Z'
+  generation: 1
+  managedFields:
+    - apiVersion: triggers.tekton.dev/v1alpha1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:serviceAccountName': {}
+          'f:triggers': {}
+      manager: Mozilla
+      operation: Update
+      time: '2025-07-17T12:14:09Z'
+    - apiVersion: triggers.tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          .: {}
+          'f:address':
+            .: {}
+            'f:url': {}
+          'f:conditions': {}
+          'f:configuration':
+            .: {}
+            'f:generatedName': {}
+      manager: openshift-pipelines-triggers-controller
+      operation: Update
+      subresource: status
+      time: '2025-07-17T12:14:42Z'
+  name: event-listener-xp3rom
+  namespace: test
+  resourceVersion: '183268'
+  uid: 9773503d-8bb5-4179-be66-c60dd27aa8b0
+spec:
+  namespaceSelector: {}
+  resources: {}
+  serviceAccountName: pipeline
+  triggers:
+    - bindings:
+        - kind: ClusterTriggerBinding
+          ref: github-push
+      template:
+        ref: trigger-template-python-fastapi-git-5f6syo
+status:
+  address:
+    url: 'http://el-event-listener-xp3rom.test.svc.cluster.local:8080'
+  conditions:
+    - lastTransitionTime: '2025-07-17T12:14:42Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+    - lastTransitionTime: '2025-07-17T12:14:42Z'
+      message: Deployment exists
+      status: 'True'
+      type: Deployment
+    - lastTransitionTime: '2025-07-17T12:14:42Z'
+      message: >-
+        ReplicaSet "el-event-listener-xp3rom-65b5666bd6" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2025-07-17T12:14:42Z'
+      message: EventListener is ready
+      status: 'True'
+      type: Ready
+    - lastTransitionTime: '2025-07-17T12:14:42Z'
+      message: Service existsapiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  creationTimestamp: '2025-07-17T12:14:09Z'
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: python-fastapi-git
+    app.kubernetes.io/name: python-fastapi-git
+    operator.tekton.dev/operand-name: openshift-pipelines-addons
+    pipeline.openshift.io/strategy: docker
+    pipeline.openshift.io/type: kubernetes
+  managedFields:
+    - apiVersion: tekton.dev/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:app.kubernetes.io/instance': {}
+            'f:app.kubernetes.io/name': {}
+            'f:operator.tekton.dev/operand-name': {}
+            'f:pipeline.openshift.io/strategy': {}
+            'f:pipeline.openshift.io/type': {}
+        'f:spec':
+          .: {}
+          'f:params': {}
+          'f:tasks': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2025-07-17T12:14:09Z'
+  name: python-fastapi-git
+  namespace: test
+  resourceVersion: '182850'
+  uid: bf137658-6417-4130-8f18-6b97cc74dce6
+spec:
+  params:
+    - default: python-fastapi-git
+      name: APP_NAME
+      type: string
+    - default: 'https://github.com/mayukh1/python-fastapi.git'
+      name: GIT_REPO
+      type: string
+    - name: GIT_REVISION
+      type: string
+    - default: 'image-registry.openshift-image-registry.svc:5000/test/python-fastapi-git'
+      name: IMAGE_NAME
+      type: string
+    - default: .
+      name: PATH_CONTEXT
+      type: string
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: subdirectory
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: workspace
+    - name: build
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE_NAME)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: CONTEXT
+          value: $(params.PATH_CONTEXT)
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: workspace
+    - name: deploy
+      params:
+        - name: SCRIPT
+          value: oc rollout status deploy/$(params.APP_NAME)
+      runAfter:
+        - build
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+  workspaces:
+    - name: workspace
+      optional: false
+  finally: []
+
+      status: 'True'
+      type: Service
+  configuration:
+    generatedName: el-event-listener-xp3rom
+-----------------------------------------------------------------------------------------------
