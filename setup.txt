@@ -20,6 +20,10 @@ $ git push origin main
 
 # step 1: build the dockerfile and push the images to quay.io and deploy as a container images
 # step 2: build as a deployment config with a build strategy docker push it to image stream and then finally run the application(https://github.com/mayukh1/python-fastapi/blob/main/build-config.sh)
-# step 3: buil as a pipeline and trigger
-https://github.com/mayukh1/python-fastapi/blob/main/tk-pipelin.sh
-Note: there will be chances you need to create the db name by inside(terminal) db pods
+# step 3: buil as a pipeline and trigger(https://github.com/mayukh1/python-fastapi/blob/main/tk-pipelin.sh)
+Note: there will be chances you need to create the db name by inside(pipeline deploy script)
+
+# login to terminal of posgresql and check the data inside database
+oc exec -it <postgres-0> -- /bin/bash
+psql -U postgresql -d test_db
+SELECT * FROM "users" LIMIT 10;
