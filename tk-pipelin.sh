@@ -6,27 +6,8 @@ NAMESPACE="fastapi"
 APP_NAME="user_auth"
 POSTGRES_NAME="postgresql"
 GITHUB_URL="https://github.com/mayukh1/python-fastapi.git"
-#SLACK_WEBHOOK="https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
-
-# ==== 1. Setup OpenShift project ====
-oc new-project "$NAMESPACE" || oc project "$NAMESPACE"
-
-# ==== 2. Create DB credentials secret ====
-oc create secret generic db-secret \
-  --from-literal=POSTGRESQL_USER=postgres \
-  --from-literal=POSTGRESQL_PASSWORD=root \
-  --from-literal=POSTGRESQL_DATABASE=test_db \
-  --dry-run=client -o yaml | oc apply -f -
-
-# ==== 3. Deploy PostgreSQL ====
-if ! oc get deploy "$POSTGRES_NAME" >/dev/null 2>&1; then
-  oc new-app postgres:13 \
-    -e POSTGRES_USER=postgres \
-    -e POSTGRES_PASSWORD=root \
-    -e POSTGRES_DB=test_db \
-    --name="$POSTGRES_NAME"
-  oc expose svc/"$POSTGRES_NAME"
-fi
+GIT_REVISION="main"
+IMAGE_NAME="image-registry.openshift-image-registry.svc:5000/test/python-fastapi-git"
 
 # ==== 4. Install Tekton tasks ====
 tkn hub install task git-clone || true
@@ -37,32 +18,59 @@ cat <<EOF | oc apply -f -
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: user-auto-deploy
+  name: $APP_NAME
+  namespace: $NAMESPACE
 spec:
   params:
     - name: GITHUB_URL
       type: string
+      default: 'https://github.com/mayukh1/python-fastapi.git'
+    - name: GIT_REVISION
+      type: string
+      default: main
     - name: APP_NAME
       type: string
     - name: NAMESPACE
       type: string
+    - name: IMAGE_NAME
+      type: string
+      default: 'image-registry.openshift-image-registry.svc:5000/test/python-fastapi-git'
   workspaces:
     - name: shared
   tasks:
-    - name: clone-repo
+    - name: fetch-repository
       taskRef:
+        kind: ClusterTask
         name: git-clone
       params:
         - name: url
-          value: \$(params.GITHUB_URL)
+          value: $(params.GITHUB_URL)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: subdirectory
+          value: ''
+        - name: deleteExisting
+          value: 'true'
       workspaces:
         - name: output
           workspace: shared
 
-    - name: build-and-deploy
+    - name: build
+      runAfter: fetch-repository
       taskRef:
-        name: openshift-client
-      runAfter: [clone-repo]
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: workspace
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE_NAME)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: CONTEXT
+          value: $(params.PATH_CONTEXT)
+
       params:
         - name: SCRIPT
           value: |
