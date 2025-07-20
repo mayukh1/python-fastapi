@@ -1,1 +1,31 @@
+$ git push -u origin main
+$ git pull origin main --allow-unrelated-histories
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 887 bytes | 63.00 KiB/s, done.
+From https://github.com/mayukh1/python-fastapi
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main
+Merge made by the 'ort' strategy.
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 README.md
+$ git push origin main
+------------------------------------------------------------------------------------------
+# requirement.txt is required for installing the dependencies for running the code
+# uvicorn authentication.main:app --reload (Run on 8000)
+# POSTGRESQL_HOST = os.getenv("POSTGRESQL_HOST", "localhost") try this on production with the postgres svc name(postgresql instate of localhost because both backend and db service are running via two different pods)
 
+# step 1: build the dockerfile and push the images to quay.io and deploy as a container images
+# step 2: build as a deployment config with a build strategy docker push it to image stream and then finally run the application( build step[1,2,3] set the env for both the pods as env in auth and db applications)
+# oc set env 
+POSTGRESQL_USER 
+POSTGRESQL_PASSWORD 
+POSTGRESQL_HOST 
+POSTGRESQL_PORT 
+POSTGRESQL_DATABASE
+POSTGRESQL_DATABASE_URL = postgresql://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
+
+Note: there will be chances you need to create the db name by inside(terminal) db pods
