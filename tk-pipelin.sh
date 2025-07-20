@@ -88,30 +88,3 @@ spec:
           workspace: shared
 EOF
 
-# ==== 7. Create TriggerTemplate ====
-cat <<EOF | oc apply -f -
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
-metadata:
-  name: user-deploy-run
-spec:
-  pipelineRef:
-    name: user-auto-deploy
-  params:
-    - name: GITHUB_URL
-      value: $GITHUB_URL
-    - name: APP_NAME
-      value: $APP_NAME
-    - name: NAMESPACE
-      value: $NAMESPACE
-  workspaces:
-    - name: shared
-      volumeClaimTemplate:
-        metadata:
-          name: fastapi-workspace-pvc
-        spec:
-          accessModes: [ "ReadWriteOnce" ]
-          resources:
-            requests:
-              storage: 1Gi
-EOF
