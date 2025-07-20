@@ -8,6 +8,7 @@ POSTGRES_NAME="postgresql"
 GITHUB_URL="https://github.com/mayukh1/python-fastapi.git"
 GIT_REVISION="main"
 IMAGE_NAME="image-registry.openshift-image-registry.svc:5000/test/python-fastapi-git"
+PATH_CONTEXT="app"
 
 # ==== 4. Install Tekton tasks ====
 tkn hub install task git-clone || true
@@ -67,6 +68,8 @@ spec:
           value: 'false'
         - name: CONTEXT
           value: $(params.PATH_CONTEXT)    #docker build -t my-image . similar to this command
+        - name: DOCKERFILE
+          value: $(params.PATH_CONTEXT)/Dockerfile
       workspaces:
         - name: source
           workspace: workspace
