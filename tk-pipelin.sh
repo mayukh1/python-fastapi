@@ -60,44 +60,29 @@ spec:
       taskRef:
         kind: ClusterTask
         name: buildah
-      workspaces:
-        - name: source
-          workspace: workspace
       params:
         - name: IMAGE
           value: $(params.IMAGE_NAME)
         - name: TLSVERIFY
           value: 'false'
         - name: CONTEXT
-          value: $(params.PATH_CONTEXT)
+          value: $(params.PATH_CONTEXT)    #docker build -t my-image . similar to this command
+      workspaces:
+        - name: source
+          workspace: workspace
 
+    - name: deploy
+      runAfter: build
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
       params:
         - name: SCRIPT
           value: |
-            #!/bin/bash
-            set -xe
-
-            oc project \$(params.NAMESPACE)
-
-            if ! oc get bc \$(params.APP_NAME); then
-              oc new-build --name=\$(params.APP_NAME) --binary --strategy=docker
+            if ! oc get deploy/$(params.APP_NAME); then
+              oc new-app --name=$(params.APP_NAME) --docker-image=$(params.IMAGE_NAME)
             fi
-            # Start build from the checked-out source
-            
-			oc start-build \$(params.APP_NAME) --from-dir=\$(workspaces.source.path) --wait
-
-            if ! oc get deploy \$(params.APP_NAME); then
-              oc new-app \$(params.APP_NAME) \
-                --name=\$(params.APP_NAME) \
-                -e POSTGRESQL_USER=postgres \
-                -e POSTGRESQL_PASSWORD=root \
-                -e POSTGRESQL_DATABASE=test_db \
-                -e POSTGRESQL_HOST=postgresql \
-                -e POSTGRESQL_PORT=5432 \
-				-e POSTGRESQL_DATABASE_URL=postgresql://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE} \
-
-              oc expose svc/\$(params.APP_NAME)
-            fi
+            oc rollout status deploy/$(params.APP_NAME)
       workspaces:
         - name: source
           workspace: shared
