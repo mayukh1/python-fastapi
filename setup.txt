@@ -27,3 +27,10 @@ Note: there will be chances you need to create the db name by inside(pipeline de
 oc exec -it <postgres-0> -- /bin/bash
 psql -U postgresql -d test_db
 SELECT * FROM "users" LIMIT 10;
+
+for building images for other arch
+--------------------------------------
+sudo apt install qemu-user-static binfmt-support
+sudo podman run --rm --privileged docker.io/multiarch/qemu-user-static --reset -p yes
+ls /proc/sys/fs/binfmt_misc/qemu-*
+podman build --arch s390x -t auth:s390x .
