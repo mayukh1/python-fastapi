@@ -20,33 +20,27 @@ cat <<EOF | oc apply -f -
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: $APP
-  namespace: $NS
+  name: FastApi-Auth
+  namespace: fastapi-tk
 spec:
   params:
-    - default: 'https://github.com/mayukh1/python-fastapi.git'
-      description: string
-      name: GIT_REPO
+    - name: GIT_REPO
+      default: 'https://github.com/mayukh1/python-fastapi.git'
       type: string
-    - default: main
-      description: string
-      name: GIT_REVISION
+    - name: GIT_REVISION
+      default: main
       type: string
-    - default: 'image-registry.openshift-image-registry.svc:5000/python-fastapi'
-      description: string
-      name: REGISTRY
+    - name: REGISTRY
+      default: 'image-registry.openshift-image-registry.svc:5000/python-fastapi'
       type: string
-    - default: authentication
-      description: string
-      name: AUTH
+    - name: AUTH
+      default: authentication
       type: string
-    - default: FastApi-Auth
-      description: string
-      name: APP
+    - name: APP
+      default: FastApi-Auth
       type: string
-    - default: '8000'
-      description: string
-      name: PORT
+    - name: PORT
+      default: "8000"
       type: string
   tasks:
     - name: fetch-repo
@@ -62,11 +56,12 @@ spec:
         name: git-clone
       workspaces:
         - name: output
-          workspace: testmayukh     #bind pvc in this workspace
+          workspace: testmayukh
+
     - name: build-authentication
       params:
         - name: IMAGE
-          value: '$(params.REGISTRY)/$(params.AUTH):latest'
+          value: $(params.REGISTRY)/$(params.AUTH):latest
         - name: DOCKERFILE
           value: Dockerfile
         - name: CONTEXT
@@ -81,6 +76,7 @@ spec:
       workspaces:
         - name: source
           workspace: testmayukh
+
     - name: deployment-authentication
       runAfter:
         - build-authentication
@@ -88,7 +84,7 @@ spec:
         kind: ClusterTask
         name: openshift-client
       params:
-	    - name: SCRIPT
+        - name: SCRIPT
           value: |
             #!/bin/sh
             set -e
@@ -96,8 +92,8 @@ spec:
             chmod +x ./deployment-tk.sh
             ./deployment-tk.sh $(params.APP) $(params.REGISTRY) $(params.PORT)
         - name: VERSION
-		  value: latest
-		  
+          value: latest
+
   workspaces:
     - name: testmayukh
       optional: false
