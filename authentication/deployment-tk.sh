@@ -2,13 +2,14 @@
 set -e
 
 # ==== CONFIG ====
-export NS="fastapi-tk"
-export username="xxxxx"
-export password="xxxxxxxxxx"
-export APP="FastApi-Auth"
-export REGISTRY="image-registry.openshift-image-registry.svc:5000/python-fastapi"
-export PORT="8000"
+# export NS="fastapi-tk"
+# export APP="FastApi-Auth"
+# export REGISTRY="image-registry.openshift-image-registry.svc:5000/python-fastapi"
+# export PORT="8000"
 
+APP=$1
+REGISTRY=$2
+PORT=$3
 
 cat <<EOF | oc apply -f -
 apiVersion: apps/v1
