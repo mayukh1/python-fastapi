@@ -10,8 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install python-multipart
 
 # Copy app code everything inside authentication folder
-# COPY authentication authentication
-COPY . .
+COPY authentication/ authentication/
+# COPY . .
 
 # Expose port
 EXPOSE 8000
