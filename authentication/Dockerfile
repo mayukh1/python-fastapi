@@ -5,7 +5,7 @@ FROM s390x/python:3.9-slim
 WORKDIR /app
 USER root
 # Install dependencies
-COPY ../requirement.txt requirements.txt
+COPY requirement.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install python-multipart
 # Copy app code
