@@ -8,12 +8,13 @@ USER root
 COPY requirement.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install python-multipart
-# Copy app code
+
+# Copy app code everything inside authentication folder
 # COPY authentication authentication
-echo "printing"
-COPY authentication/ .
+COPY . .
+
 # Expose port
 EXPOSE 8000
 
 # Run the app
-CMD ["uvicorn", "authentication.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
