@@ -5,7 +5,7 @@ set -e
 export NS="fastapi-tk"
 export username="xxxxx"
 export password="xxxxxxxxxx"
-export APP="FastApi-Auth"
+export APP="fastapi-auth"
 export REGISTRY="image-registry.openshift-image-registry.svc:5000/python-fastapi"
 export PORT="8000"
 # GITHUB_URL="https://github.com/mayukh1/python-fastapi.git"
@@ -20,7 +20,7 @@ cat <<EOF | oc apply -f -
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: FastApi-Auth
+  name: fastapi-auth
   namespace: fastapi-tk
 spec:
   params:
